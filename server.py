@@ -1199,6 +1199,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# For Vercel deployment
+handler = app
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
