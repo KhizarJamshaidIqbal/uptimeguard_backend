@@ -12,14 +12,15 @@
 
 ```
 backend/
+├── index.py              # Vercel entry point (root level)
+├── requirements.txt      # Minimal dependencies for Vercel
 ├── api/
-│   ├── index.py          # Vercel entry point (simplified)
 │   ├── server.py         # Simplified FastAPI app
 │   ├── requirements.txt  # Minimal dependencies
 │   └── test.py          # Local testing script
 ├── server.py             # Original complex app (kept for local dev)
-├── vercel.json          # Updated Vercel configuration
-└── requirements.txt     # Original dependencies
+├── vercel.json          # Fixed Vercel configuration
+└── test_deployment.py   # Deployment test script
 ```
 
 ## 🔧 Environment Variables
@@ -52,16 +53,16 @@ DB_NAME=statustrackr
 The function has been tested locally and works correctly:
 
 ```bash
-cd api
-python test.py
+python test_deployment.py
 ```
 
 Expected output:
 ```
-✅ Successfully imported server.py
-✅ App created: <FastAPI app>
-✅ All endpoints working
-🎉 All tests passed! The function should work on Vercel.
+✅ Successfully imported handler from index.py
+✅ Root endpoint status: 200
+✅ Health endpoint status: 200
+✅ API root status: 200
+🎉 All tests passed! Ready for Vercel deployment.
 ```
 
 ## 📋 Deployment Steps
