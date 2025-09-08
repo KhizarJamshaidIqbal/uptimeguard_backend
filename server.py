@@ -1074,8 +1074,17 @@ async def create_alert_settings(alert_data: AlertSettingsCreate):
 @api_router.get("/alerts/{monitor_id}", response_model=AlertSettings)
 async def get_alert_settings(monitor_id: str):
     """Get alert settings for a monitor"""
+    logger.info(f"Fetching alert settings for monitor_id: {monitor_id}")
+    
+    # Check if monitor exists
+    monitor = await db.monitors.find_one({"id": monitor_id})
+    if not monitor:
+        logger.warning(f"Monitor not found for alert settings: {monitor_id}")
+        raise HTTPException(status_code=404, detail="Monitor not found")
+    
     alert_settings = await db.alert_settings.find_one({"monitor_id": monitor_id})
     if not alert_settings:
+        logger.info(f"No alert settings found for monitor_id: {monitor_id}")
         raise HTTPException(status_code=404, detail="Alert settings not found")
     
     return AlertSettings(**alert_settings)
@@ -1093,11 +1102,20 @@ async def delete_alert_settings(monitor_id: str):
 async def get_monitor_history(monitor_id: str, hours: int = 24):
     """Get historical uptime data for charts"""
     try:
+        logger.info(f"Fetching history for monitor_id: {monitor_id}, hours: {hours}")
+        
+        # Check if monitor exists
+        monitor = await db.monitors.find_one({"id": monitor_id})
+        if not monitor:
+            logger.warning(f"Monitor not found: {monitor_id}")
+            raise HTTPException(status_code=404, detail="Monitor not found")
+        
         time_ago = datetime.utcnow() - timedelta(hours=hours)
         logs = await db.uptime_logs.find({
             "monitor_id": monitor_id,
             "timestamp": {"$gte": time_ago}
         }).sort("timestamp", 1).to_list(1000)
+        logger.info(f"Found {len(logs)} log entries for monitor {monitor_id}")
         
         # Group data by hour for better visualization
         hourly_data = {}
@@ -1181,22 +1199,12 @@ async def main_root():
         "message": "StatusTrackr Backend API",
         "version": "1.0.0",
         "status": "running",
-        "deployment": "vercel",
         "endpoints": {
             "api_root": "/api/",
             "api_docs": "/docs",
             "monitors": "/api/monitors",
             "dashboard": "/api/dashboard/stats"
         }
-    }
-
-# Health check endpoint
-@app.get("/health")
-async def health_check():
-    return {
-        "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat(),
-        "database": "connected" if client else "disconnected"
     }
 
 # Include the router in the main app
@@ -1209,7 +1217,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 
 
 # Configure logging
