@@ -10,12 +10,14 @@ from enum import Enum
 
 # MongoDB connection (simplified for Vercel)
 try:
-    from motor.motor_asyncio import AsyncIOMotorClient
+    import pymongo
+    from pymongo import MongoClient
     mongo_url = os.environ.get('MONGO_URL', 'mongodb+srv://khizarjamshaidiqbal_db_user:urCSH7kRPKhlqbdd@cluster0.no5fwid.mongodb.net/')
     db_name = os.environ.get('DB_NAME', 'statustrackr')
-    client = AsyncIOMotorClient(mongo_url)
+    client = MongoClient(mongo_url)
     db = client[db_name]
     MONGO_AVAILABLE = True
+    print("MongoDB connected successfully")
 except Exception as e:
     print(f"MongoDB connection failed: {e}")
     client = None
@@ -84,7 +86,7 @@ async def create_monitor(monitor_data: MonitorCreate):
         raise HTTPException(status_code=503, detail="Database not available")
     
     monitor = Monitor(**monitor_data.dict())
-    await db.monitors.insert_one(monitor.dict())
+    db.monitors.insert_one(monitor.dict())
     return monitor
 
 @api_router.get("/monitors", response_model=List[Monitor])
@@ -93,7 +95,7 @@ async def get_monitors():
     if not MONGO_AVAILABLE:
         return []
     
-    monitors = await db.monitors.find().to_list(1000)
+    monitors = list(db.monitors.find())
     return [Monitor(**monitor) for monitor in monitors]
 
 @api_router.get("/monitors/{monitor_id}", response_model=Monitor)
@@ -102,7 +104,7 @@ async def get_monitor(monitor_id: str):
     if not MONGO_AVAILABLE:
         raise HTTPException(status_code=503, detail="Database not available")
     
-    monitor = await db.monitors.find_one({"id": monitor_id})
+    monitor = db.monitors.find_one({"id": monitor_id})
     if not monitor:
         raise HTTPException(status_code=404, detail="Monitor not found")
     return Monitor(**monitor)
@@ -113,7 +115,7 @@ async def delete_monitor(monitor_id: str):
     if not MONGO_AVAILABLE:
         raise HTTPException(status_code=503, detail="Database not available")
     
-    result = await db.monitors.delete_one({"id": monitor_id})
+    result = db.monitors.delete_one({"id": monitor_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Monitor not found")
     
@@ -130,7 +132,7 @@ async def get_dashboard_stats():
             overall_uptime=0.0
         )
     
-    monitors = await db.monitors.find().to_list(1000)
+    monitors = list(db.monitors.find())
     
     total_monitors = len(monitors)
     monitors_up = sum(1 for m in monitors if m.get("status") == MonitorStatus.UP)
