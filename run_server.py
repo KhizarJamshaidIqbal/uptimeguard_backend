@@ -10,8 +10,7 @@ from pathlib import Path
 backend_dir = Path(__file__).parent
 sys.path.insert(0, str(backend_dir))
 
-# Set environment
-os.environ.setdefault('MONGO_URL', 'mongodb://localhost:27017')
+# Set environment defaults (only if not already set)
 os.environ.setdefault('DB_NAME', 'statustrackr')
 
 try:
@@ -19,9 +18,9 @@ try:
     import uvicorn
     
     print("🚀 Starting StatusTrackr Backend Server...")
-    print("📍 Server URL: http://localhost:8001")
-    print("📚 API Docs: http://localhost:8001/docs")
-    print("⚡ Interactive API: http://localhost:8001/redoc")
+    print("📍 Server URL: http://localhost:8003")
+    print("📚 API Docs: http://localhost:8003/docs")
+    print("⚡ Interactive API: http://localhost:8003/redoc")
     print("\n⚠️  Note: MongoDB connection required for full functionality")
     print("💡 Tip: You can use MongoDB Atlas or local MongoDB")
     print("\n🔄 Starting server... (Press Ctrl+C to stop)\n")
@@ -30,7 +29,7 @@ try:
     uvicorn.run(
         app, 
         host="0.0.0.0", 
-        port=8001,  # Changed to port 8001 to avoid conflicts
+        port=8003,  # Changed to port 8003 to avoid conflicts
         reload=False,  # Disable reload to avoid dependency issues
         access_log=True,
         log_level="info"

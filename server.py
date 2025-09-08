@@ -1173,6 +1173,21 @@ async def stop_monitoring_service():
         monitoring_task = None
         logger.info("Monitoring service stopped")
 
+# Root endpoint for the main app
+@app.get("/")
+async def main_root():
+    return {
+        "message": "StatusTrackr Backend API",
+        "version": "1.0.0",
+        "status": "running",
+        "endpoints": {
+            "api_root": "/api/",
+            "api_docs": "/docs",
+            "monitors": "/api/monitors",
+            "dashboard": "/api/dashboard/stats"
+        }
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
