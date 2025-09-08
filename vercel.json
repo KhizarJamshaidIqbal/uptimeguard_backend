@@ -13,17 +13,6 @@
     }
   ],
   "env": {
-    "PYTHON_VERSION": "3.11.9",
-    "MONGO_URL": "@mongo_url",
-    "DB_NAME": "@db_name",
-    "EMAIL_HOST": "@email_host",
-    "EMAIL_PORT": "@email_port",
-    "EMAIL_USER": "@email_user",
-    "EMAIL_PASSWORD": "@email_password",
-    "EMAIL_FROM": "@email_from",
-    "EMAIL_FROM_NAME": "@email_from_name",
-    "DEBUG": "@debug",
-    "HOST": "@host",
-    "PORT": "@port"
+    "PYTHON_VERSION": "3.11.9"
   }
 }
