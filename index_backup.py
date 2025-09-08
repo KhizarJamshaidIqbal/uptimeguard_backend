@@ -200,8 +200,7 @@ try:
     )
     logger = logging.getLogger(__name__)
 
-    # Vercel handler
-    handler = app
+
 
 except Exception as e:
     # Fallback error handler

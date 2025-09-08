@@ -197,5 +197,4 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Vercel handler
-handler = app
+
